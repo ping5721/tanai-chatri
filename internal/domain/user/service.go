@@ -8,9 +8,9 @@ type UserServiceInterface interface {
 	getUsers(ctx context.Context) ([]User, error)
 }
 type UserService struct {
-	userRepository *UserRepository
+	UserRepository *UserRepository
 }
 
 func (u *UserService) getUsers(ctx context.Context) ([]User, error) {
-	return u.userRepository.getUsers(ctx)
+	return u.UserRepository.getUsers(ctx)
 }

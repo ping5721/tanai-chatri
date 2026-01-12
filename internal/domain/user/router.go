@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func NewUserRouter(r *echo.Echo, userService UserServiceInterface) {
+func NewUserRouter(r *echo.Echo, userService *UserService) {
 	userGroup := r.Group("/users")
 	{
 		userGroup.GET("/", func(c echo.Context) error {

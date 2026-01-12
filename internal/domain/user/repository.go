@@ -6,12 +6,12 @@ import (
 )
 
 type UserRepository struct {
-	db *ent.Client
+	Db *ent.Client
 	// redis *redis.Client
 }
 
 func (userRepository *UserRepository) getUsers(ctx context.Context) ([]User, error) {
-	users, err := userRepository.db.User.Query().All(ctx)
+	users, err := userRepository.Db.User.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (userRepository *UserRepository) getUsers(ctx context.Context) ([]User, err
 // 	// 	}
 // 	// 	return user, nil
 // 	// }
-// 	result := userRepository.db.First(&user, id)
+// 	result := userRepository.Db.First(&user, id)
 // 	if result.Error != nil {
 // 		return user, result.Error
 // 	}
