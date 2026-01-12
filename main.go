@@ -59,6 +59,7 @@ func main() {
 
 	userRepository := user.UserRepository{Db: client}
 	userService := user.UserService{UserRepository: &userRepository}
-	user.NewUserRouter(e, &userService)
+	userHandler := user.UserHandler{UserService: &userService}
+	user.NewUserRouter(e, &userHandler)
 	e.Logger.Fatal(e.Start(":8080"))
 }

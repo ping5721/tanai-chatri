@@ -3,6 +3,7 @@ package user
 import (
 	"backend/ent"
 	"context"
+	"fmt"
 )
 
 type UserRepository struct {
@@ -13,6 +14,7 @@ type UserRepository struct {
 func (userRepository *UserRepository) getUsers(ctx context.Context) ([]User, error) {
 	users, err := userRepository.Db.User.Query().All(ctx)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	result := make([]User, len(users))
