@@ -11,7 +11,7 @@ func NewUserRouter(r *echo.Echo, userService UserServiceInterface) {
 	userGroup := r.Group("/users")
 	{
 		userGroup.GET("/", func(c echo.Context) error {
-			users, err := userService.getUser(c.Request().Context())
+			users, err := userService.getUsers(c.Request().Context())
 			if err != nil {
 				c.JSON(http.StatusNotFound, nil)
 			}

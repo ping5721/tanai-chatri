@@ -1,41 +1,47 @@
 package user
 
 import (
+	"backend/ent"
 	"context"
-	"encoding/json"
-	"os/user"
-
-	"github.com/redis/go-redis/v9"
-	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	db    *gorm.DB
-	redis *redis.Client
+	db *ent.Client
+	// redis *redis.Client
 }
 
-func (userRepository *UserRepository) getUsers() ([]user.User, error) {
-	users := []user.User{}
-	result := userRepository.db.Find(&users)
-	if result.Error != nil {
-		return nil, result.Error
+func (userRepository *UserRepository) getUsers(ctx context.Context) ([]User, error) {
+	users, err := userRepository.db.User.Query().All(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return users, nil
-}
-
-func (userRepository *UserRepository) getUser(id int, ctx context.Context) (user.User, error) {
-	userCache := userRepository.redis.Get(ctx, "user:1")
-	user := user.User{}
-	if userCache.Err() == nil {
-		err := json.Unmarshal([]byte(userCache.Val()), &user)
-		if err != nil {
-			return user, err
+	result := make([]User, len(users))
+	for i, u := range users {
+		result[i] = User{
+			ID:        u.ID,
+			Age:       u.Age,
+			Name:      u.Name,
+			Username:  u.Username,
+			CreatedAt: u.CreatedAt,
+			Premium:   u.Premium,
 		}
-		return user, nil
 	}
-	result := userRepository.db.First(&user, id)
-	if result.Error != nil {
-		return user, result.Error
-	}
-	return user, nil
+	return result, nil
 }
+
+// func (userRepository *UserRepository) getUser(id int, ctx context.Context) (user.User, error) {
+// 	// userCache := userRepository.redis.Get(ctx, cache.RedisKey.UserKey(id))
+// 	// user := user.User{}
+// 	// if userCache.Err() == nil {
+// 	// 	err := json.Unmarshal([]byte(userCache.Val()), &user)
+// 	// 	if err != nil {
+// 	// 		return user, err
+// 	// 	}
+// 	// 	return user, nil
+// 	// }
+// 	result := userRepository.db.First(&user, id)
+// 	if result.Error != nil {
+// 		return user, result.Error
+// 	}
+// 	return user, nil
+// }
