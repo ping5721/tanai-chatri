@@ -7,7 +7,7 @@ import (
 func NewUserRouter(r *echo.Echo, userHandler *UserHandler) {
 
 	userGroup := r.Group("/users")
-	
+
 	// GetUser godoc
 	// @Summary Get user
 	// @Tags user

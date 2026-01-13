@@ -1,32 +1,53 @@
 package user
 
 import (
-	"backend/ent"
 	"context"
 	"fmt"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UserRepository struct {
-	Db *ent.Client
+	// Db      *ent.Client
+	MongoDb *mongo.Client
 	// redis *redis.Client
 }
 
 func (userRepository *UserRepository) getUsers(ctx context.Context) ([]User, error) {
-	users, err := userRepository.Db.User.Query().All(ctx)
+	collection := userRepository.MongoDb.Database("tanai-chatri").Collection("users")
+	cursor, err := collection.Find(ctx, map[string]interface{}{})
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
-	result := make([]User, len(users))
-	for i, u := range users {
-		result[i] = User{
+	defer cursor.Close(ctx)
+
+	var result []User
+	for cursor.Next(ctx) {
+		var u struct {
+			ID        int       `bson:"id"`
+			Age       int       `bson:"age"`
+			Name      string    `bson:"name"`
+			Username  string    `bson:"username"`
+			CreatedAt time.Time `bson:"created_at"`
+			Premium   bool      `bson:"premium"`
+		}
+		if err := cursor.Decode(&u); err != nil {
+			fmt.Println(err)
+			continue
+		}
+		result = append(result, User{
 			ID:        u.ID,
 			Age:       u.Age,
 			Name:      u.Name,
 			Username:  u.Username,
 			CreatedAt: u.CreatedAt,
 			Premium:   u.Premium,
-		}
+		})
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
 	}
 	return result, nil
 }
